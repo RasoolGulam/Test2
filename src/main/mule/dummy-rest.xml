@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f5701354-3e61-4261-a063-ed8d3e8c9c46" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dummy-restFlow" doc:id="ce88d488-b4d8-4906-b39b-23cfd65f31ee" >
+		<http:listener doc:name="Listener" doc:id="9ae7f297-d1b6-4c1d-8184-9c2482ab5d07" config-ref="HTTP_Listener_config" path="dummy"/>
+		<logger level="INFO" doc:name="Logger" doc:id="555f0b7a-c970-4f1a-9045-294021c81813" message="Start Flow"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="439d5294-abd1-41d5-91d7-c3837ac545a3" millisBetweenRetries="50000">
+			<http:request method="GET" doc:name="Request" doc:id="456c5749-985a-41f2-9d2b-230d5170285b" url="http://dummy.restapiexample.com/api/v1/employees" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="d6a9e2f3-5417-484a-92fd-57c1165c018c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+	payload.data map (item,valueOfindex)->{
+		
+		"ID": item.id,
+		"Name": item.employee_name,
+		"Age": item.employee_age
+	
+	}
+	
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3a45726b-8921-4f5f-be96-a19387a8e6e3" message="End Flow ==============#[payload]"/>
+	</flow>
+</mule>
