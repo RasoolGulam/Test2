@@ -24,7 +24,7 @@ output application/json
 		
 		"ID": item.id,
 		"Name": item.employee_name,
-		"Age": item.employee_age
+	
 	
 	}
 	
